@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ranking de Retenção da Madrugada</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--bg:#D3E3FF;--panel:#FFFFFF;--line:#A3BDEE;--text:#0E1630;--mute:#4A5878;--cy:#006FA6;--vi:#5B45E0;--glow:rgba(0,111,166,.10);color-scheme:light;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B2F7A;--panel:#12409A;--line:#3A66C4;--text:#EEF3FF;--mute:#BCCDF6;--cy:#5CE6FF;--vi:#8F82FF;--glow:rgba(61,224,255,.12);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B2F7A;--panel:#12409A;--line:#3A66C4;--text:#EEF3FF;--mute:#BCCDF6;--cy:#5CE6FF;--vi:#8F82FF;--glow:rgba(61,224,255,.12);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.6 "Space Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:44px 44px;background-attachment:fixed}
+body::after{content:"";position:fixed;inset:0;background:radial-gradient(ellipse at 20% 0%,transparent 0%,var(--bg) 70%);z-index:-1;pointer-events:none}
+.w{max-width:1000px;margin:0 auto;padding:0 20px}
+.mono{font-family:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+header{padding:72px 0 40px}
+.tag{display:inline-block;border:1px solid var(--cy);color:var(--cy);padding:3px 10px;border-radius:99px;font-size:13px}
+h1{font-size:clamp(34px,7vw,66px);line-height:1.04;letter-spacing:-.03em;margin:18px 0 16px;font-weight:700;max-width:14em}
+.lead{color:var(--mute);font-size:19px;max-width:40em;margin:0}
+h2{font-size:clamp(24px,4vw,34px);letter-spacing:-.02em;margin:0 0 6px}
+section{padding:44px 0;border-top:1px solid var(--line)}
+p{margin:.5em 0 1em;max-width:46em}
+.sub{color:var(--mute);margin:0 0 22px}
+.chain{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin:28px 0 4px}
+.chain div{flex:1 1 130px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:14px;position:relative}
+.chain div:not(:last-child)::after{content:">";position:absolute;right:-12px;top:50%;transform:translateY(-50%);color:var(--cy);font-family:"JetBrains Mono",monospace;z-index:1;background:var(--bg);padding:0 1px}
+.note{border-left:3px solid var(--vi);background:var(--glow);padding:10px 14px;border-radius:0 8px 8px 0;color:var(--text);max-width:46em;font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+.box b{display:block;color:var(--cy);font-family:"JetBrains Mono",monospace;font-weight:600;font-size:22px}
+.box span{color:var(--mute);font-size:14px}
+.tl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0;margin:20px 0;border-top:2px solid var(--cy)}
+.tl div{padding:14px 14px 0 0;position:relative;font-size:14px}
+.tl div::before{content:"";position:absolute;top:-7px;left:0;width:12px;height:12px;border-radius:50%;background:var(--cy)}
+.tl b{display:block;padding-top:8px;font-size:15px}
+.tl span{color:var(--mute)}
+.scroll{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;width:100%;min-width:480px;font-size:15px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:500;font-size:13px}
+td.n{font-family:"JetBrains Mono",monospace;color:var(--cy)}
+ul{padding-left:20px;max-width:46em}li{margin:.3em 0}
+.sim{background:var(--panel);border:1px solid var(--cy);border-radius:12px;padding:22px;box-shadow:0 0 0 4px var(--glow);margin-top:26px}
+.sim h3{margin:0 0 4px;font-size:20px}
+.sim label{display:flex;justify-content:space-between;gap:12px;margin-top:14px;font-size:15px}
+.sim output{font-family:"JetBrains Mono",monospace;color:var(--cy);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--cy);margin:8px 0 0;min-height:28px}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:20px}
+.res div{border:1px solid var(--line);border-radius:8px;padding:12px}
+.res b{display:block;font:600 28px "JetBrains Mono",monospace;color:var(--text)}
+.res span{font-size:13px;color:var(--mute)}
+.bar{display:flex;height:10px;border-radius:99px;overflow:hidden;margin-top:18px;background:var(--line)}
+.bar i{display:block;height:100%;transition:width .25s}
+.bar .a{background:var(--vi)}.bar .b{background:var(--cy)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.q{font-size:clamp(20px,3.2vw,28px);line-height:1.35;letter-spacing:-.01em;max-width:30em;font-weight:500}
+.f{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:6px}
+.f label{display:block;margin:0;font-size:14px;color:var(--mute)}
+.f input{display:block;width:100%;margin-top:6px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font:600 18px "JetBrains Mono",ui-monospace,monospace;min-height:44px}
+.f input:focus-visible,button:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+.ok{color:var(--cy)}.no{color:var(--vi)}
+.btn{margin-top:14px;background:transparent;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:9px 14px;font:500 14px "Space Grotesk",system-ui,sans-serif;cursor:pointer;min-height:40px}
+footer{padding:36px 0 56px;color:var(--mute);font-size:14px;border-top:1px solid var(--line)}
+@media (max-width:640px){.chain div:not(:last-child)::after{display:none}header{padding-top:48px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="w">
+<header>
+<span class="tag mono">proposta em análise · SantaGroup</span>
+<h1>Ranking de Retenção da Madrugada</h1>
+<p class="lead">Uma competição semanal entre facções para manter iniciantes conectados das 00h às 08h. Quem retém mais ganha VIPs de 7 dias. O objetivo da cidade é cair menos que os concorrentes na lista do FiveM.</p>
+<div class="chain" aria-label="Cadeia de hipóteses">
+<div>Menor perda de jogadores</div><div>Melhor posição relativa</div><div>Mais exposição</div><div>Mais primeiras conexões e WLs</div><div>Mais jogadores recorrentes</div>
+</div>
+<p class="sub">Essa cadeia é uma hipótese a validar, não um resultado comprovado.</p>
+</header>
+
+<section>
+<h2>Como funciona</h2>
+<p class="sub">Regras propostas. Valores provisórios e ajustáveis.</p>
+<div class="grid">
+<div class="box"><b>00h–08h</b><span>Janela diária de apuração, no fuso da cidade</span></div>
+<div class="box"><b>7 madrugadas</b><span>Duração do ciclo semanal</span></div>
+<div class="box"><b>≥ 3 / noite</b><span>Meta mínima: 21 retenções válidas no ciclo</span></div>
+</div>
+<div class="tl">
+<div><b>Seg 08h</b><span>Fecha o ciclo</span></div>
+<div><b>Segunda</b><span>Anúncio das vencedoras</span></div>
+<div><b>Terça</b><span>VIPs entregues no RR</span></div>
+<div><b>7 dias</b><span>Foto da campeã no telão</span></div>
+</div>
+<p><b>Pontuação = retenções válidas nas 7 madrugadas ÷ 7.</b> Não vale só o melhor dia, nem dividir apenas pelos dias de participação.</p>
+<p class="note">Exemplo: 4, 3, 5, 2, 3, 4 e 3 retidos somam 24. A média é 24 ÷ 7 = 3,43, acima da meta de 3.</p>
+</section>
+
+<section>
+<h2>O que conta como retenção válida</h2>
+<p class="sub">Ainda não definido. É a decisão mais importante antes do lançamento.</p>
+<div class="cols">
+<div class="box"><b style="font-size:16px">Critérios a decidir</b><ul><li>Definição formal de iniciante</li><li>Online às 00h e permanência até as 08h, ou mínimo de horas na janela</li><li>Atividade real, não AFK</li><li>No máximo 1 contagem por madrugada por facção</li></ul></div>
+<div class="box"><b style="font-size:16px">Limitação</b><p>Estar online às 00h e às 08h não prova conexão contínua nem atividade real. Presença, sessão, atividade e AFK precisam ser medidos separadamente. Retenção de virada também não é o mesmo que D+1 ou D+7.</p></div>
+</div>
+</section>
+
+<section>
+<h2>Premiação e simulador</h2>
+<p class="sub">Todas as recompensas são VIPs de 7 dias. Cada facção recebe só a faixa da sua posição, sempre com a meta mínima cumprida.</p>
+<div class="scroll"><table>
+<tr><th>Posição</th><th>Prêmio</th></tr>
+<tr><td class="n">TOP 1</td><td>10 VIPs + banner no telão por 7 dias</td></tr>
+<tr><td class="n">TOP 2</td><td>7 VIPs</td></tr>
+<tr><td class="n">TOP 3</td><td>5 VIPs</td></tr>
+<tr><td class="n">TOP 4</td><td>3 VIPs</td></tr>
+<tr><td class="n">TOP 5 em diante</td><td>1 VIP por facção qualificada</td></tr>
+</table></div>
+<p class="note">VIPs por ciclo = prêmios do TOP 1 ao 4 existentes + máx(Q − 4; 0) × 1, onde Q é o número de facções qualificadas. Com Q = 0, o prêmio é zero.</p>
+<div class="sim">
+<h3>Simule o volume de VIPs</h3>
+<span class="sub" style="font-size:14px">Mede quantidade de VIPs e dias de benefício, não custo em reais.</span>
+<label for="q">Facções qualificadas (Q) <output id="qo">30</output></label>
+<input id="q" type="range" min="0" max="30" value="30">
+<div class="res">
+<div><b id="r1">51</b><span>VIPs por ciclo</span></div>
+<div><b id="r2">357</b><span>dias de benefício por ciclo</span></div>
+<div><b id="r3">204</b><span>VIPs em 4 semanas</span></div>
+</div>
+<div class="bar" aria-hidden="true"><i class="a" id="b1"></i><i class="b" id="b2"></i></div>
+<span class="sub" style="font-size:13px;display:block;margin-top:6px"><span style="color:var(--vi)">Roxo</span>: prêmios do TOP 1 ao 4. <span style="color:var(--cy)">Ciano</span>: faixa básica do TOP 5 em diante.</span>
+</div>
+</section>
+
+<section id="calculadora">
+<h2>Calculadora de retenção base</h2>
+<p class="sub">Preencha com os dados reais da sua cidade. O cálculo é automático e mostra uma previsão média de partida, não uma garantia.</p>
+<div class="sim">
+<h3>Previsão média por facção</h3>
+<span class="sub" style="font-size:14px">Os valores iniciais são exemplos. Substitua pelos números da sua cidade.</span>
+<div class="f">
+<label for="wl">Total de WLs aprovadas<input id="wl" type="number" min="0" inputmode="numeric" value="1200"></label>
+<label for="at">Iniciantes ativos na cidade<input id="at" type="number" min="0" inputmode="numeric" value="300"></label>
+<label for="fc">Facções participantes<input id="fc" type="number" min="1" inputmode="numeric" value="30"></label>
+<label for="p0">% dos iniciantes online às 00h<input id="p0" type="number" min="0" max="100" inputmode="decimal" value="35"></label>
+<label for="p8">% desses que ficam até as 08h<input id="p8" type="number" min="0" max="100" inputmode="decimal" value="50"></label>
+</div>
+<button class="btn" id="rst" type="button">Limpar valores</button>
+<div class="res">
+<div><b id="c1">25%</b><span>iniciantes ativos ÷ WLs (base de retenção)</span></div>
+<div><b id="c2">10</b><span>iniciantes ativos por facção</span></div>
+<div><b id="c3">52,5</b><span>retenções esperadas por madrugada na cidade</span></div>
+<div><b id="c4">1,8</b><span>média esperada por facção por madrugada</span></div>
+</div>
+<p id="c5" class="note" style="margin-top:16px"></p>
+<div class="scroll" style="margin-top:10px"><table>
+<tr><th>Cenário (ganho por facção)</th><th>Média por madrugada</th><th>Total no ciclo (7 noites)</th><th>Meta de 3 por noite</th></tr>
+<tbody id="c6"></tbody>
+</table></div>
+<p class="sub" style="font-size:13px;margin-top:12px">Retenções esperadas = iniciantes ativos × % online às 00h × % que ficam até as 08h. A média por facção divide o total igualmente, mas na prática as facções são desiguais. Use os dados reais de cada uma antes de decidir. Os cenários somam o ganho hipotético (3, 5 e 8) à média e nunca passam do número de iniciantes por facção.</p>
+</div>
+</section>
+
+<section>
+<h2>Cenários de preservação</h2>
+<p class="sub">Hipóteses de iniciantes adicionais por facção, com 30 facções. Não são resultados observados.</p>
+<div class="grid">
+<div class="box"><b>90</b><span>Conservador: 3 por facção</span></div>
+<div class="box"><b>150</b><span>Base: 5 por facção</span></div>
+<div class="box"><b>240</b><span>Agressivo: 8 por facção</span></div>
+</div>
+<p>É preciso descontar quem já permaneceria conectado, sobreposições e a capacidade do servidor, e estimar o efeito às 02h, 04h, 06h e 08h antes de indicar o cenário mais viável.</p>
+</section>
+
+<section>
+<h2>Modelo A ou Modelo B</h2>
+<div class="scroll"><table>
+<tr><th></th><th>A: diário</th><th>B: semanal</th></tr>
+<tr><td>Regra</td><td>1 VIP de 3 dias a cada 5 iniciantes retidos</td><td>Ranking com VIPs de 7 dias e meta mínima</td></tr>
+<tr><td>Custo</td><td>Menos previsível</td><td>Mais previsível</td></tr>
+<tr><td>Consistência</td><td>Incentivo menor</td><td>Incentivo maior, pela média de 7 dias</td></tr>
+<tr><td>Facções menores</td><td>Acesso maior</td><td>Pode desanimar se a meta for alta</td></tr>
+<tr><td>Risco de exploração</td><td>Maior</td><td>Menor, com controles e desempate</td></tr>
+</table></div>
+<p class="sub" style="margin-top:12px">Antes de calcular o Modelo A: confirmar arredondamento e unidade de apuração.</p>
+</section>
+
+<section>
+<h2>Riscos e controles</h2>
+<div class="cols">
+<div class="box"><ul><li>Contas alternativas e jogadores parados só para pontuar</li><li>Troca de facção ou presença em duas facções</li><li>Resultado concentrado em poucos dias</li></ul></div>
+<div class="box"><ul><li>Uma contagem por iniciante por madrugada</li><li>Separar jogadores únicos de retenções repetidas</li><li>Critério de desempate definido antes do lançamento</li></ul></div>
+</div>
+</section>
+
+<section>
+<h2>Experimento de 14 dias</h2>
+<p class="sub">Com responsável definido, rotina de acompanhamento e critérios de sucesso.</p>
+<div class="cols">
+<div class="box"><b style="font-size:16px">Métricas</b><ul><li>População média 00h–08h e às 04h, 06h e 08h</li><li>Queda percentual</li><li>Retenções válidas e jogadores únicos por facção</li><li>Novas WLs e primeiras conexões</li><li>Retenção D+1 e D+7</li><li>Posição relativa e VIPs concedidos</li></ul></div>
+<div class="box"><b style="font-size:16px">Cuidados</b><ul><li>Comparar dias equivalentes (fim de semana, eventos)</li><li>Separar o que já ocorreria do ganho incremental</li><li>O D+7 de quem entra no fim só fecha após o 14º dia</li><li>Correlação não prova causalidade</li></ul></div>
+</div>
+</section>
+
+<section>
+<h2>Dados necessários</h2>
+<div class="scroll"><table>
+<tr><th>Dado</th><th>Para quê</th></tr>
+<tr><td>População por hora, 20h–08h, últimos 30 dias</td><td>Curva e queda entre 00h e 08h</td></tr>
+<tr><td>Iniciantes e suas facções</td><td>Retenção e ranking</td></tr>
+<tr><td>AFK, atividade e desconexões</td><td>Separar presença de atividade real</td></tr>
+<tr><td>WLs e primeiras conexões por horário</td><td>Aquisição</td></tr>
+<tr><td>Posição histórica no FiveM e concorrentes</td><td>Impacto competitivo</td></tr>
+<tr><td>Valor financeiro do VIP</td><td>Custo em reais</td></tr>
+</table></div>
+</section>
+
+<section>
+<h2>A pergunta do estudo</h2>
+<p class="q">Quantos jogadores precisamos preservar na madrugada para melhorar nossa posição no FiveM, quantas WLs isso pode gerar e qual ranking dá o melhor incentivo com o menor custo sustentável em VIPs?</p>
+<p>A resposta depende dos dados acima. Sem eles, qualquer número é hipótese.</p>
+<h2 style="margin-top:28px;font-size:22px">Pontos em aberto</h2>
+<ul><li>Definição de iniciante e de retenção válida</li><li>Critério de desempate</li><li>Regra para troca ou duplicidade de facção</li><li>Arredondamento e apuração do Modelo A</li><li>Valor do VIP e responsável pelo experimento</li></ul>
+</section>
+
+<footer class="mono">Proposta para análise. Nada aqui está implantado em produção.</footer>
+</div>
+<script>
+(function(){
+var q=document.getElementById("q");
+function f(n){return n.toLocaleString("pt-BR")}
+function calc(){
+var Q=+q.value,p=[10,7,5,3],top=0,i;
+for(i=0;i<Math.min(Q,4);i++)top+=p[i];
+var base=Math.max(Q-4,0),v=top+base;
+document.getElementById("qo").textContent=Q;
+document.getElementById("r1").textContent=f(v);
+document.getElementById("r2").textContent=f(v*7);
+document.getElementById("r3").textContent=f(v*4);
+document.getElementById("b1").style.width=(v?top/v*100:0)+"%";
+document.getElementById("b2").style.width=(v?base/v*100:0)+"%";
+}
+q.addEventListener("input",calc);calc();
+var ids=["wl","at","fc","p0","p8"],el={};
+ids.forEach(function(k){el[k]=document.getElementById(k);el[k].addEventListener("input",calc2)});
+function n(k){var v=parseFloat(el[k].value);return isFinite(v)&&v>0?v:0}
+function d(x){return x.toLocaleString("pt-BR",{maximumFractionDigits:1})}
+function calc2(){
+var wl=n("wl"),at=n("at"),fc=Math.max(n("fc"),0),p0=Math.min(n("p0"),100)/100,p8=Math.min(n("p8"),100)/100;
+var rate=wl?at/wl*100:0,per=fc?at/fc:0,ret=at*p0*p8,pn=fc?ret/fc:0;
+document.getElementById("c1").textContent=d(rate)+"%";
+document.getElementById("c2").textContent=d(per);
+document.getElementById("c3").textContent=d(ret);
+document.getElementById("c4").textContent=d(pn);
+var s=document.getElementById("c5");
+if(!fc||!at){s.textContent="Informe iniciantes ativos e facções para ver a previsão."}
+else if(pn>=3){s.textContent="Na média, cada facção já atingiria a meta de 3 retenções por madrugada, mesmo sem incentivo. Revise o desenho da meta ou da premiação."}
+else{s.textContent="Faltam cerca de "+d(3-pn)+" retenções por facção por madrugada para atingir a meta média de 3. Os cenários abaixo mostram quanto de ganho seria necessário."}
+var rows="",g=[["Conservador (+3)",3],["Base (+5)",5],["Agressivo (+8)",8]];
+g.forEach(function(x){var m=Math.min(pn+x[1],per),t=m*7,ok=m>=3;
+rows+="<tr><td>"+x[0]+"</td><td class=\"n\">"+d(m)+"</td><td class=\"n\">"+d(t)+"</td><td class=\""+(ok?"ok":"no")+"\">"+(ok?"Atinge":"Não atinge")+"</td></tr>"});
+document.getElementById("c6").innerHTML=rows;
+}
+document.getElementById("rst").addEventListener("click",function(){ids.forEach(function(k){el[k].value=""});calc2();el.wl.focus()});
+calc2();
+})();
+</script>
+</body>
+</html>
